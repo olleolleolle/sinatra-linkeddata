@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Sinatra-linkeddata : Sinatra extension for Linked Data content negotiation." />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Sinatra-linkeddata</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/ruby-rdf/sinatra-linkeddata">View on GitHub</a>
+
+          <h1 id="project_title">Sinatra-linkeddata</h1>
+          <h2 id="project_tagline">Sinatra extension for Linked Data content negotiation.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/ruby-rdf/sinatra-linkeddata/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/ruby-rdf/sinatra-linkeddata/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="linked-data-content-negotiation-for-sinatra-applications" class="anchor" href="#linked-data-content-negotiation-for-sinatra-applications"><span class="octicon octicon-link"></span></a>Linked Data Content Negotiation for Sinatra Applications</h1>
+
+<p>This is a <a href="http://www.sinatrarb.com/">Sinatra</a> extension that provides <a href="http://linkeddata.org/">Linked Data</a> content
+negotiation for Sinatra applications.</p>
+
+<ul>
+<li><a href="http://github.com/datagraph/sinatra-linkeddata">http://github.com/datagraph/sinatra-linkeddata</a></li>
+</ul><p><a href="http://badge.fury.io/rb/sinatra-linkeddata"><img src="https://badge.fury.io/rb/sinatra-linkeddata.png" alt="Gem Version"></a>
+<a href="http://travis-ci.org/ruby-rdf/sinatra-linkeddata"><img src="https://travis-ci.org/ruby-rdf/sinatra-linkeddata.png?branch=master" alt="Build Status"></a></p>
+
+<h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>Implements <a href="http://en.wikipedia.org/wiki/Content_negotiation">HTTP content negotiation</a> for RDF content types using
+the <a href="http://datagraph.rubyforge.org/rack-linkeddata/"><code>Rack::LinkedData</code></a> middleware.</li>
+<li>Supports all <a href="http://ruby-rdf.github.com/rdf/">RDF.rb</a>-compatible serialization formats.</li>
+<li>Supports both classic and modular Sinatra applications.</li>
+</ul><h2>
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h2>
+
+<h3>
+<a name="adding-linked-data-content-negotiation-to-a-classic-sinatra-application" class="anchor" href="#adding-linked-data-content-negotiation-to-a-classic-sinatra-application"><span class="octicon octicon-link"></span></a>Adding Linked Data content negotiation to a classic Sinatra application</h3>
+
+<pre><code>#!/usr/bin/env ruby -rubygems
+require 'sinatra'
+require 'sinatra/linkeddata'
+
+get '/hello' do
+  RDF::Graph.new do |graph|
+    graph &lt;&lt; [RDF::Node.new, RDF::DC.title, "Hello, world!"]
+  end
+end
+</code></pre>
+
+<h3>
+<a name="adding-linked-data-content-negotiation-to-a-modular-sinatra-application" class="anchor" href="#adding-linked-data-content-negotiation-to-a-modular-sinatra-application"><span class="octicon octicon-link"></span></a>Adding Linked Data content negotiation to a modular Sinatra application</h3>
+
+<pre><code>#!/usr/bin/env ruby -rubygems
+require 'sinatra/base'
+require 'sinatra/linkeddata'
+
+module My
+  class Application &lt; Sinatra::Base
+    register Sinatra::LinkedData
+
+    get '/hello' do
+      RDF::Graph.new do |graph|
+        graph &lt;&lt; [RDF::Node.new, RDF::DC.title, "Hello, world!"]
+      end
+    end
+  end
+end
+
+My::Application.run! :host =&gt; '127.0.0.1', :port =&gt; 4567
+</code></pre>
+
+<h3>
+<a name="adding-linked-data-content-negotiation-to-a-rackup-application" class="anchor" href="#adding-linked-data-content-negotiation-to-a-rackup-application"><span class="octicon octicon-link"></span></a>Adding Linked Data content negotiation to a Rackup application</h3>
+
+<pre><code>#!/usr/bin/env rackup
+require 'sinatra/base'
+require 'sinatra/linkeddata'
+
+module My
+  class Application &lt; Sinatra::Base
+    register Sinatra::LinkedData
+
+    get '/hello' do
+      RDF::Graph.new do |graph|
+        graph &lt;&lt; [RDF::Node.new, RDF::DC.title, "Hello, world!"]
+      end
+    end
+  end
+end
+
+run My::Application
+</code></pre>
+
+<h3>
+<a name="testing-linked-data-content-negotiation-using-rackup-and-curl" class="anchor" href="#testing-linked-data-content-negotiation-using-rackup-and-curl"><span class="octicon octicon-link"></span></a>Testing Linked Data content negotiation using <code>rackup</code> and <code>curl</code>
+</h3>
+
+<pre><code>$ rackup doc/examples/config.ru
+
+$ curl -iH "Accept: application/n-triples" http://localhost:9292/hello
+$ curl -iH "Accept: application/turtle" http://localhost:9292/hello
+$ curl -iH "Accept: application/rdf+xml" http://localhost:9292/hello
+$ curl -iH "Accept: application/json" http://localhost:9292/hello
+$ curl -iH "Accept: application/trix" http://localhost:9292/hello
+$ curl -iH "Accept: */*" http://localhost:9292/hello
+</code></pre>
+
+<h2>
+<a name="description" class="anchor" href="#description"><span class="octicon octicon-link"></span></a>Description</h2>
+
+<p><code>Sinatra::LinkedData</code> is a thin Sinatra-specific wrapper around the
+<a href="http://datagraph.rubyforge.org/rack-linkeddata/"><code>Rack::LinkedData</code></a> middleware, which implements Linked
+Data content negotiation for Rack applications.</p>
+
+<p>At the moment the Sinatra extension simply corresponds
+to doing the following manually in a Sinatra application:</p>
+
+<pre><code>require 'rack/linkeddata'
+
+module My
+  class Application &lt; Sinatra::Base
+    use     Rack::LinkedData::ContentNegotiation
+    helpers Sinatra::LinkedData::Helpers
+    include RDF
+    include LinkedData
+  end
+end
+</code></pre>
+
+<p>See the <code>Rack::LinkedData</code> documentation for more information on the
+operation and details of the content negotiation.</p>
+
+<h2>
+<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
+
+<p><a href="http://rubydoc.info/github/ruby-rdf/sinatra-linkeddata/">http://rubydoc.info/github/ruby-rdf/sinatra-linkeddata/</a></p>
+
+<ul>
+<li>{Sinatra::LinkedData}</li>
+</ul><h2>
+<a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h2>
+
+<ul>
+<li>
+<a href="http://rubygems.org/gems/sinatra">Sinatra</a> (&gt;= 1.4.4)</li>
+<li>
+<a href="http://rubygems.org/gems/rack-linkeddata">Rack::LinkedData</a> (&gt;= 1.1.0)</li>
+</ul><h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>The recommended installation method is via <a href="http://rubygems.org/">RubyGems</a>.
+To install the latest official release of the gem, do:</p>
+
+<pre><code>% [sudo] gem install sinatra-linkeddata
+</code></pre>
+
+<h2>
+<a name="download" class="anchor" href="#download"><span class="octicon octicon-link"></span></a>Download</h2>
+
+<p>To get a local working copy of the development repository, do:</p>
+
+<pre><code>% git clone git://github.com/ruby-rdf/sinatra-linkeddata.git
+</code></pre>
+
+<p>Alternatively, you can download the latest development version as a tarball
+as follows:</p>
+
+<pre><code>% wget http://github.com/ruby-rdf/sinatra-linkeddata/tarball/master
+</code></pre>
+
+<h2>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<p>This repository uses <a href="https://github.com/nvie/gitflow">Git Flow</a> to mange development and release activity. All submissions <em>must</em> be on a feature branch based on the <em>develop</em> branch to ease staging and integration.</p>
+
+<ul>
+<li>Do your best to adhere to the existing coding conventions and idioms.</li>
+<li>Don't use hard tabs, and don't leave trailing whitespace on any line.</li>
+<li>Do document every method you add using <a href="http://yardoc.org/">YARD</a> annotations. Read the
+<a href="http://rubydoc.info/docs/yard/file/docs/GettingStarted.md">tutorial</a> or just look at the existing code for examples.</li>
+<li>Don't touch the <code>.gemspec</code>, <code>VERSION</code> or <code>AUTHORS</code> files. If you need to
+change them, do so on your private branch only.</li>
+<li>Do feel free to add yourself to the <code>CREDITS</code> file and the corresponding
+list in the the <code>README</code>. Alphabetical order applies.</li>
+<li>Do note that in order for us to merge any non-trivial changes (as a rule
+of thumb, additions larger than about 15 lines of code), we need an
+explicit <a href="http://unlicense.org/#unlicensing-contributions">public domain dedication</a> on record from you.</li>
+</ul><h2>
+<a name="references" class="anchor" href="#references"><span class="octicon octicon-link"></span></a>References</h2>
+
+<ul>
+<li><a href="http://www.w3.org/DesignIssues/LinkedData.html">http://www.w3.org/DesignIssues/LinkedData.html</a></li>
+<li><a href="http://linkeddata.org/docs/how-to-publish">http://linkeddata.org/docs/how-to-publish</a></li>
+<li><a href="http://linkeddata.org/conneg-303-redirect-code-samples">http://linkeddata.org/conneg-303-redirect-code-samples</a></li>
+<li><a href="http://www.w3.org/TR/cooluris/">http://www.w3.org/TR/cooluris/</a></li>
+<li><a href="http://www.w3.org/TR/swbp-vocab-pub/">http://www.w3.org/TR/swbp-vocab-pub/</a></li>
+<li><a href="http://patterns.dataincubator.org/book/publishing-patterns.html">http://patterns.dataincubator.org/book/publishing-patterns.html</a></li>
+</ul><h2>
+<a name="authors" class="anchor" href="#authors"><span class="octicon octicon-link"></span></a>Authors</h2>
+
+<ul>
+<li>
+<a href="http://github.com/bendiken">Arto Bendiken</a> - <a href="http://ar.to/">http://ar.to/</a>
+</li>
+<li>
+<a href="http://github.com/gkellogg">Gregg Kellogg</a> - <a href="http://greggkellogg.net/">http://greggkellogg.net/</a>
+</li>
+</ul><h2>
+<a name="contributing-1" class="anchor" href="#contributing-1"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<p>This repository uses <a href="https://github.com/nvie/gitflow">Git Flow</a> to mange development and release activity. All submissions <em>must</em> be on a feature branch based on the <em>develop</em> branch to ease staging and integration.</p>
+
+<ul>
+<li>Do your best to adhere to the existing coding conventions and idioms.</li>
+<li>Don't use hard tabs, and don't leave trailing whitespace on any line.</li>
+<li>Do document every method you add using <a href="http://yardoc.org/">YARD</a> annotations. Read the
+<a href="http://rubydoc.info/docs/yard/file/docs/GettingStarted.md">tutorial</a> or just look at the existing code for examples.</li>
+<li>Don't touch the <code>.gemspec</code>, <code>VERSION</code> or <code>AUTHORS</code> files. If you need to
+change them, do so on your private branch only.</li>
+<li>Do feel free to add yourself to the <code>CREDITS</code> file and the corresponding
+list in the the <code>README</code>. Alphabetical order applies.</li>
+<li>Do note that in order for us to merge any non-trivial changes (as a rule
+of thumb, additions larger than about 15 lines of code), we need an
+explicit <a href="http://unlicense.org/#unlicensing-contributions">public domain dedication</a> on record from you.</li>
+</ul><h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p><code>Sinatra::LinkedData</code> is free and unencumbered public domain software. For more
+information, see <a href="http://unlicense.org/">http://unlicense.org/</a> or the accompanying UNLICENSE file.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Sinatra-linkeddata maintained by <a href="https://github.com/ruby-rdf">ruby-rdf</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
